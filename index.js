@@ -1,4 +1,5 @@
 module.exports = [
-	require('./src/rooms.js'),
-	require('./src/sayhi.js')
+	require('./src/rooms'),
+	require('./src/sayhi'),
+	require('./src/google')
 ]

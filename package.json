@@ -2,6 +2,9 @@
   "name": "fb-core-modules",
   "version": "0.0.0",
   "description": "Fritbot Core Modules",
+  "dependencies": {
+    "request": ""
+  },
   "main": "./src/index.js",
   "repository": {
     "type": "git",

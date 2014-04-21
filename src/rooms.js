@@ -1,9 +1,14 @@
 function leaveRoom(route, args) {
 	if (args.length == 0) {
-		this.send(route, "Ok, bye!")
-			.then(function() {				
-				this.connector.leaveRoom(route.room);	
-			});
+		if (route.room) {
+			this.send(route, "Ok, bye!")
+				.then(function() {				
+					this.connector.leaveRoom(route.room);	
+				});
+		} else {
+			this.send(route, "We're talking privately, I can't leave!")
+		}
+
 
 	} else if (args.length == 1) {
 		this.send(route, "Leaving " + args[0]);
