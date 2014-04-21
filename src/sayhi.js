@@ -25,6 +25,7 @@ module.exports = {
 		}
 	],
 
+	// For the record, this listener could more or less be accomplished by a Fact, but I wanted to test out init + listeners during development.
 	listeners: [{
 			'name': 'Be Polite',
 			'description': "What a nice bot.",
