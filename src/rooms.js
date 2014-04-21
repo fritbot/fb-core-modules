@@ -1,24 +1,24 @@
 function leaveRoom(route, args) {
 	if (args.length == 0) {
-		this.bot.send(route, "Ok, bye!")
+		this.send(route, "Ok, bye!")
 			.then(function() {				
-				this.bot.connector.leaveRoom(route.room);	
+				this.connector.leaveRoom(route.room);	
 			});
 
 	} else if (args.length == 1) {
-		this.bot.send(route, "Leaving " + args[0]);
-		this.bot.connector.leaveRoom(args[0]);
+		this.send(route, "Leaving " + args[0]);
+		this.connector.leaveRoom(args[0]);
 	} else {
-		this.bot.send(route, "I was only expecting one room to leave!");
+		this.send(route, "I was only expecting one room to leave!");
 	}
 }
 
 function joinRoom(route, args) {
 	if (args.length == 1) {
-		this.bot.send(route, "Jumping into " + args[0]);
-		this.bot.connector.joinRoom(args[0]);
+		this.send(route, "Jumping into " + args[0]);
+		this.connector.joinRoom(args[0]);
 	} else {
-		this.bot.send(route, "I was expecting one room to join!");
+		this.send(route, "I was expecting one room to join!");
 	}
 }
 
