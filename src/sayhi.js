@@ -16,10 +16,9 @@ module.exports = {
 			'trigger': /say ((hi)|(hello))( to)?/i,
 			'func': function (route, args) {
 				if (args.length) {
-					route.user = null; // Drop user so we don't direct the message at them
-					this.send(route, "Hello, " + args.join(' ') + "!");
+					route.indirect().send("Hello, " + args.join(' ') + "!");
 				} else {
-					this.send(route, "Hi there!");
+					route.send("Hi there!");
 				}
 			}
 		}
@@ -29,9 +28,9 @@ module.exports = {
 	listeners: [{
 			'name': 'Be Polite',
 			'description': "What a nice bot.",
-			'trigger': null,
+			'trigger': null, // Not a normal use case, but an interesting one: The triggers are set up during the init.
 			'func': function (route, args) {
-				this.send(route, "Hi there!");
+				route.send("Hi there!");
 				return true;
 			}
 		}

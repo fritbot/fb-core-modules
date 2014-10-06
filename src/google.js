@@ -24,12 +24,12 @@ function googleSearch(route, args) {
 					msg += util.format("%d: %s - %s\n", i + 1, data['results'][i]['titleNoFormatting'], data['results'][i]['url'])					
 				}
 				msg += "For more results, see " + data['cursor']['moreResultsUrl'];
-				this.send(route, msg);
+				route.send(msg);
 			} else {
-				this.send(route, data['results'][0]['titleNoFormatting'] + " - " + data['results'][0]['url']);
+				route.send(data['results'][0]['titleNoFormatting'] + " - " + data['results'][0]['url']);
 			}
 		} else {
-			this.send(route, "Sorry, Google doesn't seem to know anything about that.");
+			route.send("Sorry, Google doesn't seem to know anything about that.");
 		}
 	}.bind(this));
 }

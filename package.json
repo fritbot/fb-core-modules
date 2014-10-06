@@ -12,8 +12,8 @@
   },
   "keywords": [
     "fritbot",
-    "modules",
-    "chat"
+    "chat",
+    "fritbot-module"
   ],
   "author": "Michael Pratt",
   "license": "MIT",
