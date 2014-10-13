@@ -5,5 +5,6 @@ module.exports = {
 	'children': [
 		require('./src/rooms'),
 		require('./src/sayhi'),
-		require('./src/google')
+		require('./src/google'),
+		require('./src/weather')
 	]};
