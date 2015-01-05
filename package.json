@@ -5,6 +5,12 @@
   "dependencies": {
     "request": ""
   },
+  "devDependencies": {
+    "grunt": "",
+    "grunt-push-release": "",
+    "grunt-contrib-jshint": "",
+    "grunt-jscs": ""
+  },
   "main": "./src/index.js",
   "repository": {
     "type": "git",

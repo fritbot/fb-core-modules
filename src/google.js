@@ -10,40 +10,40 @@ function googleSearch(route, args) {
 		args = args.slice(1);
 	}
 
-	url = "http://ajax.googleapis.com/ajax/services/search/web?" + querystring.stringify({v: "1.0", q: args.join(' ')});
+	url = 'http://ajax.googleapis.com/ajax/services/search/web?' + querystring.stringify({ v : '1.0', q : args.join(' ') });
 
 	request.get(url, function (err, res, body) {
 		var results = JSON.parse(body),
-			data = results['responseData'];
+			data = results.responseData;
 
-		if (data['results']) {
+		if (data.results) {
 			if (more) {
 				var msg = '\n';
 
-				for (var i = 0; i < data['results'].length; i++) {
-					msg += util.format("%d: %s - %s\n", i + 1, data['results'][i]['titleNoFormatting'], data['results'][i]['url'])					
+				for (var i = 0; i < data.results.length; i++) {
+					msg += util.format('%d: %s - %s\n', i + 1, data.results.i.titleNoFormatting, data.results.i.url);
 				}
-				msg += "For more results, see " + data['cursor']['moreResultsUrl'];
+				msg += 'For more results, see ' + data.cursor.moreResultsUrl;
 				route.send(msg);
 			} else {
-				route.send(data['results'][0]['titleNoFormatting'] + " - " + data['results'][0]['url']);
+				route.send(data.results[0].titleNoFormatting + ' - ' + data.results[0].url);
 			}
 		} else {
-			route.send("Sorry, Google doesn't seem to know anything about that.");
+			route.send('Sorry, Google doesn\'t seem to know anything about that.');
 		}
 	}.bind(this));
 }
 
 module.exports = {
-	'displayname': "Google",
-	'description': "Searches for things for you.",
+	displayname : 'Google',
+	description : 'Searches for things for you.',
 
-	commands: [{
-			'name': 'Google',
-			'description': "Finds the first search result. Use the 'more' option to get more results.",
-			'usage': 'google [more ](search terms)',
-			'trigger': /google/i,
-			'func': googleSearch
+	commands : [{
+			name : 'Google',
+			description : 'Finds the first search result. Use the "more" option to get more results.',
+			usage : 'google [more ](search terms)',
+			trigger : /google/i,
+			func : googleSearch
 		}
 	]
-}
+};
