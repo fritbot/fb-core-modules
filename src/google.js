@@ -21,7 +21,7 @@ function googleSearch(route, args) {
 				var msg = '\n';
 
 				for (var i = 0; i < data.results.length; i++) {
-					msg += util.format('%d: %s - %s\n', i + 1, data.results.i.titleNoFormatting, data.results.i.url);
+					msg += util.format('%d: %s - %s\n', i + 1, data.results[i].titleNoFormatting, data.results[i].url);
 				}
 				msg += 'For more results, see ' + data.cursor.moreResultsUrl;
 				route.send(msg);
@@ -36,7 +36,7 @@ function googleSearch(route, args) {
 
 module.exports = {
 	displayname : 'Google',
-	description : 'Searches for things for you.',
+	description : 'Let me google that for you.',
 
 	commands : [{
 			name : 'Google',
