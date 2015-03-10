@@ -26,7 +26,7 @@ module.exports = {
 
         query.where('date').gt(new Date(new Date().getTime() - QUOTE_TIMEOUT));
         query.sort('-date');
-        query.select('id nickname text');
+        query.select('id nickname text user_id');
 
         query.exec(function (err, quotedata) {
             if (quotedata) {
