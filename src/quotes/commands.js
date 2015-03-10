@@ -1,5 +1,49 @@
 var QUOTE_TIMEOUT = 3 * 60 * 60 * 1000; // 3 hours ago (in milliseconds);
 
+function doQuotes(route, args, count) {
+    var bot = this,
+        username = args.shift(),
+        user;
+
+    count = count || 1;
+
+    function getQuote (err, quotes) {
+        if (quotes.length) {
+            var quote, output = [];
+            for (var i = 0; i < quotes.length; i++) {
+                quote = quotes[i];
+                output.push(quote.nick + ': ' + quote.text);
+            }
+            route.indirect().send(output.join('\n'));
+        } else {
+            var name = 'anyone';
+            if (user) {
+                name = user.nick;
+            }
+            route.send('I don\'t remember ' + name + ' saying anything like that.');
+        }
+    }
+
+    if (username !== 'anyone') {
+        user = bot.users.getUserMatch(username);
+
+        if (!user) {
+            user = bot.db.schemas.quote.getQuoteNick(username, function (err, user) {
+                if (!user) {
+                    args.unshift(username);
+                    bot.db.schemas.quote.random(args.join(' '), null, count, getQuote);
+                } else {
+                    bot.db.schemas.quote.random(args.join(' '), username, count, getQuote);
+                }
+            });
+        } else {
+            bot.db.schemas.quote.random(args.join(' '), user.nick, count, getQuote);
+        }
+    } else {
+        bot.db.schemas.quote.random(args.join(' '), null, count, getQuote);
+    }
+}
+
 module.exports = {
     remember : function (route, args) {
         var bot = this,
@@ -57,40 +101,9 @@ module.exports = {
         });
     },
     quote : function (route, args) {
-        var bot = this,
-            username = args.shift(),
-            user;
-
-        function getQuote (err, quote) {
-            if (quote) {
-                route.indirect().send('"' + quote.text + '"  - ' + quote.nick);
-            } else {
-                var name = 'anyone';
-                if (user) {
-                    name = user.nick;
-                }
-                route.send('I don\'t remember ' + name + ' saying anything like that.');
-            }
-        }
-
-        if (username !== 'anyone') {
-            user = bot.users.getUserMatch(username);
-
-            if (!user) {
-                user = bot.db.schemas.quote.getQuoteNick(username, function (err, user) {
-                    if (!user) {
-                        args.unshift(username);
-                        bot.db.schemas.quote.randomOne(args.join(' '), null, getQuote);
-                    } else {
-                        bot.db.schemas.quote.randomOne(args.join(' '), username, getQuote);
-                    }
-                });
-            } else {
-                bot.db.schemas.quote.randomOne(args.join(' '), user.nick, getQuote);
-            }
-        } else {
-            bot.db.schemas.quote.randomOne(args.join(' '), null, getQuote);
-        }
+        doQuotes.call(this, route, args);
     },
-    quotemash : function () {}
+    quotemash : function (route, args) {
+        doQuotes.call(this, route, args, Math.floor(Math.random() * 4) + 3);
+    }
 };
