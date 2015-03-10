@@ -1,9 +1,15 @@
 {
   "name": "fb-core-modules",
-  "version": "0.1.0",
+  "version": "0.4.0",
   "description": "Fritbot Core Modules",
   "dependencies": {
     "request": ""
+  },
+  "devDependencies": {
+    "grunt": "",
+    "grunt-push-release": "",
+    "grunt-contrib-jshint": "",
+    "grunt-jscs": ""
   },
   "main": "./src/index.js",
   "repository": {
