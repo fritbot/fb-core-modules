@@ -1,6 +1,6 @@
 {
   "name": "fb-core-modules",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Fritbot Core Modules",
   "dependencies": {
     "request": ""
