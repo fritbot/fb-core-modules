@@ -18,7 +18,7 @@ module.exports = {
             route.send("I can't remember nothing! Double negatives. Sometimes appropriate.");
         }
 
-        var query = bot.db.schemas.message.findOne({ text : new RegExp(quote, 'i') });
+        var query = bot.db.schemas.message.findOne({ text : new RegExp(quote, 'i'), outbound : false });
 
         if (user) {
             query.where('user_id').equals(user.id);
@@ -59,17 +59,9 @@ module.exports = {
     quote : function (route, args) {
         var bot = this,
             username = args.shift(),
-            user, quote;
+            user;
 
-        user = bot.users.getUserMatch(username);
-
-        if (!user) {
-            args.unshift(username);
-        }
-
-        quote = args.join(' ');
-
-        bot.db.schemas.quote.randomOne(quote, user, function (err, quote) {
+        function getQuote (err, quote) {
             if (quote) {
                 route.indirect().send('"' + quote.text + '"  - ' + quote.nick);
             } else {
@@ -79,7 +71,26 @@ module.exports = {
                 }
                 route.send('I don\'t remember ' + name + ' saying anything like that.');
             }
-        });
+        }
+
+        if (username !== 'anyone') {
+            user = bot.users.getUserMatch(username);
+
+            if (!user) {
+                user = bot.db.schemas.quote.getQuoteNick(username, function (err, user) {
+                    if (!user) {
+                        args.unshift(username);
+                        bot.db.schemas.quote.randomOne(args.join(' '), null, getQuote);
+                    } else {
+                        bot.db.schemas.quote.randomOne(args.join(' '), username, getQuote);
+                    }
+                });
+            } else {
+                bot.db.schemas.quote.randomOne(args.join(' '), user.nick, getQuote);
+            }
+        } else {
+            bot.db.schemas.quote.randomOne(args.join(' '), null, getQuote);
+        }
     },
     quotemash : function () {}
 };

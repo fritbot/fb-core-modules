@@ -3,8 +3,8 @@ module.exports = function (bot) {
     var quoteSchema = new bot.db.mongoose.Schema({
         message_id : bot.db.mongoose.Schema.Types.ObjectId,
         user_id : bot.db.mongoose.Schema.Types.ObjectId,
-        nick : String,
-        text : String,
+        nick : { type : String, required : true },
+        text : { type : String, required : true },
         imported : { type : Boolean, default : false },
         date : { type : Date, default : Date.now }
     });
@@ -33,7 +33,7 @@ module.exports = function (bot) {
         }
 
         if (user) {
-            query.nick = new RegExp(user.nick, 'i');
+            query.nick = new RegExp(user, 'i');
         }
 
         obj.count(query, function (err, count) {
@@ -67,6 +67,18 @@ module.exports = function (bot) {
 
             findOne([]);
 
+        });
+    };
+
+    quoteSchema.statics.getQuoteNick = function (username, callback) {
+        this.findOne({ nick : new RegExp(username) }, function (err, data) {
+            if (err) {
+                callback(err, null);
+            } else if (data) {
+                callback(null, data.nick);
+            } else {
+                callback(null, null);
+            }
         });
     };
 
