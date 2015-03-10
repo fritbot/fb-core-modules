@@ -1,3 +1,5 @@
+var QUOTE_TIMEOUT = 3 * 60 * 60 * 1000; // 3 hours ago (in milliseconds);
+
 module.exports = {
 	remember : function (route, args) {
 		var bot = this,
@@ -12,11 +14,19 @@ module.exports = {
 
 		quote = args.join(' ');
 
+		if (quote.length === 0) {
+			route.send("I can't remember nothing! Double negatives. Sometimes appropriate.");
+		}
+
 		var query = bot.db.schemas.message.findOne({ text : new RegExp(quote, 'i') });
 
 		if (user) {
 		 	query.where('user_id').equals(user.id);
 		}
+
+		query.where('date').gt(new Date(new Date().getTime() - QUOTE_TIMEOUT));
+		query.sort('-date');
+		query.select('id nickname text');
 
 		query.exec(function (err, quotedata) {
 			if (quotedata) {
@@ -39,14 +49,37 @@ module.exports = {
 					});
 				}
 			} else {
-				if (user) {
-					route.send('I don\'t remember ' + user.nick + ' saying "' + quote + '"');
-				} else {
-					route.send('I don\'t remember anyone saying "' + quote + '"');
-				}
+				var name = 'anyone';
+				if (user) { name = user.nick; }
+
+				route.send('I don\'t remember ' + name + ' saying "' + quote + '"');
 			}
 		});
 	},
-	quote : function () {},
+	quote : function (route, args) {
+		var bot = this,
+			username = args.shift(),
+			user, quote;
+
+		user = bot.users.getUserMatch(username);
+
+		if (!user) {
+			args.unshift(username);
+		}
+
+		quote = args.join(' ');
+
+		bot.db.schemas.quote.randomOne(quote, user, function (err, quote) {
+			if (quote) {
+				route.indirect().send('"' + quote.text + '"  - ' + quote.nick);
+			} else {
+				var name = 'anyone';
+				if (user) {
+					name = user.nick;
+				}
+				route.send('I don\'t remember ' + name + ' saying anything like that.');
+			}
+		});
+	},
 	quotemash : function () {}
 };
