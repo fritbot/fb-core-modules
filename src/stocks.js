@@ -3,8 +3,17 @@ var querystring = require('querystring'),
 
 function getStocks(route, args) {
 
+    console.log(args);
+
+    if (args.length === 0) {
+        route.send("Hey jackweed... perhaps you should provide a stock symbol... ?");
+        return;
+    }
+
     // Parse stock symbols from the args
-    var symbols = args.length ? args.map(function(x){return x.replace(/,/g, '');}) : '';
+    var symbols = args.map(function (symbol){
+        return symbol.replace(/,/g, '');
+    });
 
     // Set up the URL for the request
     var url = 'http://www.google.com/finance/info?infotype=infoquoteall&q=' + querystring.escape(symbols);
