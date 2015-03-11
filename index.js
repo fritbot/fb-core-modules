@@ -6,5 +6,6 @@ module.exports = {
         require('./src/quotes'),
         require('./src/rooms'),
         require('./src/sayhi'),
+        require('./src/stocks'),
         require('./src/weather')
     ] };
