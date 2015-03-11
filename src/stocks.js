@@ -44,12 +44,12 @@ function getStocks(route, args) {
 }
 
 module.exports = {
-    'displayname': "Stocks",
-    'description': "Returns information for the requested stock symbol.",
+    'displayname': 'Stocks',
+    'description': 'Returns information for the requested stock symbol.',
 
     commands: [{
             'name': 'Stocks',
-            'description': "Returns information for the requested stock symbol.",
+            'description': 'Returns information for the requested stock symbol.',
             'usage': 'stock [search term]',
             'trigger': /stock/i,
             'func': getStocks
