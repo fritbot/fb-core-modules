@@ -3,8 +3,6 @@ var querystring = require('querystring'),
 
 function getStocks(route, args) {
 
-    console.log(args);
-
     if (args.length === 0) {
         route.send("Hey jackweed... perhaps you should provide a stock symbol... ?");
         return;
