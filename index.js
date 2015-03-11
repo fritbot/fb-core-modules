@@ -8,4 +8,5 @@ module.exports = {
         require('./src/sayhi'),
         require('./src/stocks'),
         require('./src/weather')
-    ] };
+    ]
+};
