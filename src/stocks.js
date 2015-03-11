@@ -35,7 +35,7 @@ function getStocks(route, args) {
             }
 
         } else {
-            route.send("Erm... something went very wrong; sorry about that. Maybe that's not a stock symbol?");
+            route.send("Erm... something went very wrong. Maybe that's not a stock symbol?");
         }
 
     }.bind(this));
