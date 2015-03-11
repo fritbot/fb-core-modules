@@ -40,7 +40,8 @@ module.exports = {
 	'displayname': "Weather",
 	'description': "Gets the current weather.",
 
-	commands: [{
+	commands: [
+		{
 			'name': 'Weather',
 			'description': "Gets the current weather.",
 			'usage': 'weather [search term]',
