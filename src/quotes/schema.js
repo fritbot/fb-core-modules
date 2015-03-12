@@ -5,13 +5,11 @@ module.exports = function (bot) {
     var quoteSchema = new bot.db.mongoose.Schema({
         message_id : bot.db.mongoose.Schema.Types.ObjectId,
         user_id : bot.db.mongoose.Schema.Types.ObjectId,
-        nick : { type : String, required : true },
+        nick : { type : String, required : true, index : true },
         text : { type : String, required : true },
         imported : { type : Boolean, default : false },
         date : { type : Date, default : Date.now }
     });
-
-    quoteSchema.index({ text : 'text' });
 
     quoteSchema.statics.randomOne = function (quote, user, callback) {
         quoteSchema.statics.random.call(this, quote, user, 1, function (err, selected) {
