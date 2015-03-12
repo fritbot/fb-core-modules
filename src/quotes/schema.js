@@ -1,3 +1,5 @@
+var _ = require('lodash');
+
 // Add quote schema to bot
 module.exports = function (bot) {
     var quoteSchema = new bot.db.mongoose.Schema({
@@ -35,39 +37,18 @@ module.exports = function (bot) {
         if (user) {
             query.nick = new RegExp(user, 'i');
         }
-
-        obj.count(query, function (err, count) {
-            if (err) {
-                return callback(err);
-            }
-
-            // Magic recursive loop
-            function findOne(selected) {
-                if (selected.length >= limit) {
-                    callback(null, selected);
+        obj.find(query)
+            .exec(function (err, data) {
+                if (err) {
+                    callback(err, null);
                 } else {
-                    var start = Math.max(0, Math.floor(count * Math.random()));
-                    obj.find(query)
-                        .skip(start)
-                        .limit(1)
-                        .exec(function (err, data) {
-                            if (err) {
-                                callback(err, null);
-                            } else {
-                                if (data.length > 0) {
-                                    selected.push(data[0]);
-                                    findOne(selected);
-                                } else {
-                                    callback(null, selected);
-                                }
-                            }
-                        });
+                    if (data && data.length > 0) {
+                        callback(null, _.sample(data, limit));
+                    } else {
+                        callback(null, []);
+                    }
                 }
-            }
-
-            findOne([]);
-
-        });
+            });
     };
 
     quoteSchema.statics.getQuoteNick = function (username, callback) {

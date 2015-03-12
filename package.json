@@ -3,7 +3,8 @@
   "version": "0.4.0",
   "description": "Fritbot Core Modules",
   "dependencies": {
-    "request": ""
+    "request": "",
+    "lodash": ""
   },
   "devDependencies": {
     "grunt": "",
