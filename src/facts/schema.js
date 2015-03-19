@@ -1,34 +1,37 @@
 var _ = require('lodash');
+var Q = require('q');
 
 var loaded_triggers = [];
 
 function loadTrigger(trigger) {
 	trigger.rex = new RegExp(trigger.trigger, 'i');
 	loaded_triggers.push(trigger);
+	// Pass through trigger for deferred chaining
+	return Q(trigger);
 }
 
 module.exports = function (bot) {
 
 	// Create trigger schema
 	var triggerSchema = new bot.db.mongoose.Schema({
-		trigger : { type : String, required : true, index : true }
+		trigger : { type : String, required : true, index : true },
+		alias : { type : bot.db.mongoose.Schema.Types.ObjectId, ref : 'FactTrigger' }
 	});
 
 	// Get a random factoid from this trigger.
-	triggerSchema.methods.getFactoid = function (callback) {
-		bot.db.schemas.factFactoid.find({ trigger : this.id }, function (err, factoids) {
-			if (!err && factoids && factoids.length > 0) {
-				callback(null, _.sample(factoids));
+	triggerSchema.methods.getFactoid = function () {
+		console.log(this, this.alias || this.id);
+		return bot.db.schemas.factFactoid.findQ({ trigger : this.alias || this.id }).then(function (factoids) {
+			if (factoids && factoids.length > 0) {
+				return Q(_.sample(factoids));
 			} else {
-				callback(err);
+				return Q.reject('Nothing found.');
 			}
 		});
 	};
 
-	// Checks message, sends random factoid and the match info in callback if triggered.
-	// Returns false if it knows given message will not trigger anything.
-	// Returns true if message matches a trigger, even if it eventually doesn't return a factoid.
-	triggerSchema.statics.checkMessage = function (message, callback) {
+	// Checks message, returns match info if trigger.
+	triggerSchema.statics.checkMessage = function (message) {
 		var triggers = [];
 		for (var i = 0; i < loaded_triggers.length; i ++ ) {
 			var trigger = loaded_triggers[i];
@@ -38,53 +41,46 @@ module.exports = function (bot) {
 			}
 		}
 
-		// If nothing was triggered, immediately fire null callback and return false.
-		if (triggers.length === 0) {
-			callback(null, null, null);
-			return false;
-		}
-
-		// If something was triggered, start the async process to gather it...
-		var selected = _.sample(triggers);
-		selected.trigger.getFactoid(function (err, factoid) {
-			console.log("got factoid", err, factoid, selected.match);
-			callback(err, factoid, selected.match);
-		});
-
-		// And return true.
-		return true;
+		return _.sample(triggers);
 	};
 
 	// Static method to save a factoid. Creates fact trigger if neccesary.
-	triggerSchema.statics.saveFactoid = function (trigger, factoid, author, callback) {
-		bot.db.schemas.factTrigger.findOne({ trigger : trigger }, function (err, existing_trigger) {
-			if (err) {
-				callback(err);
-				return;
-			}
+	triggerSchema.statics.saveFactoid = function (trigger, factoid, author) {
 
-			function saveFactoidInTrigger(err, trigger) {
-				if (err) {
-					callback(err);
-					return;
-				}
-
-				bot.db.schemas.factFactoid.create({
-					trigger : trigger._id,
-					factoid : factoid,
-					author : author
-				}, callback);
-			}
-
+		return bot.db.schemas.factTrigger.findOneQ({ trigger : trigger }).then(function (existing_trigger) {
+			// Create trigger if neccesary, if not, no-op and pass along the trigger.
 			if (!existing_trigger) {
-				bot.db.schemas.factTrigger.create({ trigger : trigger }, function (err, new_trigger) {
-					if (!err) { loadTrigger(new_trigger); }
-					saveFactoidInTrigger(err, new_trigger);
-				});
+				return bot.db.schemas.factTrigger.createQ({ trigger : trigger }).then(loadTrigger);
 			} else {
-				saveFactoidInTrigger(null, existing_trigger);
+				return Q(existing_trigger);
 			}
+		}).then(function (trigger) {
+			// Create the factoid.
+			return bot.db.schemas.factFactoid.createQ({
+				trigger : trigger._id,
+				factoid : factoid,
+				author : author
+			});
 		});
+
+	};
+
+	// Alias a trigger to another trigger. Accepts an ObjectID or string of the trigger.
+	// aliased must exist or an error will be thrown. Passing a string will attempt to find a matching loaded trigger.
+	triggerSchema.statics.saveAlias = function (trigger, aliased) {
+		var orig = aliased;
+		if (typeof aliased === typeof '') {
+			aliased = _.find(loaded_triggers, 'trigger', aliased);
+			if (!aliased) {
+				aliased = _.find(loaded_triggers, 'trigger', '\\b' + orig + '\\b');
+			}
+		}
+
+		if (!aliased) {
+			return Q.reject('Trigger not found');
+		}
+
+		return bot.db.schemas.factTrigger.createQ({ trigger : trigger, alias : aliased.alias || aliased._id }).then(loadTrigger);
 	};
 
 	// Create trigger model

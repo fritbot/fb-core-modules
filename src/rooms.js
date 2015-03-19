@@ -35,12 +35,14 @@ module.exports = {
             name : 'Leave Room',
             usage : 'leave [room_name]',
             trigger : /leave/i,
-            func : leaveRoom
+            func : leaveRoom,
+            core : true
         }, {
             name : 'Join Room',
             usage : 'join (room_name)',
             trigger : /join/i,
-            func : joinRoom
+            func : joinRoom,
+            core : true
         }
     ]
 };

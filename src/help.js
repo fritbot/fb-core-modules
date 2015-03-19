@@ -59,6 +59,7 @@ module.exports = {
 		Description : 'Show all available commands',
 		usage : 'help [topic]',
 		trigger : /help/i,
-		func : displayHelp
+		func : displayHelp,
+		core : true
 	}]
 };

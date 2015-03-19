@@ -4,7 +4,8 @@
   "description": "Fritbot Core Modules",
   "dependencies": {
     "request": "",
-    "lodash": ""
+    "lodash": "",
+    "q": ""
   },
   "devDependencies": {
     "grunt": "",
