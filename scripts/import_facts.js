@@ -27,10 +27,12 @@ csv.on('data', function (line) {
 	lines.push(line);
 });
 
+// Function to process a single line.
+// Since we need these to happen strictly in sequence, so we can get aliases matched, we need to mix Q and async.
 function processLine (line, callback) {
 	var trigger = line[0];
 
-	// Required to drop the args to callback, since we're mixing Q and async.
+	// Required to drop the args to callback so async doesn't think we're throwing an error.
 	function cb () {
 		callback();
 	}

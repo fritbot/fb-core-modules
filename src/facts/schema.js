@@ -5,7 +5,12 @@ var loaded_triggers = [];
 var loaded_words = {};
 
 function loadTrigger(trigger) {
+	// Precompile the regex
 	trigger.rex = new RegExp(trigger.trigger, 'i');
+
+	// When bot starts, let all facts be triggered immediately
+	trigger.timeout = new Date();
+
 	loaded_triggers.push(trigger);
 	// Pass through trigger for deferred chaining
 	return Q(trigger);
@@ -31,7 +36,6 @@ module.exports = function (bot) {
 
 	// Get a random factoid from this trigger.
 	triggerSchema.methods.getFactoid = function () {
-		console.log(this, this.alias || this.id);
 		return bot.db.schemas.factFactoid.findQ({ trigger : this.alias || this.id }).then(function (factoids) {
 			if (factoids && factoids.length > 0) {
 				return Q(_.sample(factoids));
@@ -44,11 +48,18 @@ module.exports = function (bot) {
 	// Checks message, returns match info if trigger.
 	triggerSchema.statics.checkMessage = function (message) {
 		var triggers = [];
+		var now = new Date();
 		for (var i = 0; i < loaded_triggers.length; i ++ ) {
 			var trigger = loaded_triggers[i];
 			var match = message.match(trigger.rex);
+
+			// Valid trigger ONLY if we've passed the timeout OR the matched phrase is the message exactly.
 			if (match) {
-				triggers.push({ trigger : trigger, match : match });
+				if (match[0].length === message.length || trigger.timeout < now) {
+					triggers.push({ trigger : trigger, match : match });
+				} else {
+					console.log('Would have triggered', trigger.trigger, 'but can\'t yet');
+				}
 			}
 		}
 

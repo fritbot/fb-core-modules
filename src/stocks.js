@@ -4,12 +4,12 @@ var querystring = require('querystring'),
 function getStocks(route, args) {
 
     if (args.length === 0) {
-        route.send("Hey jackweed... perhaps you should provide a stock symbol... ?");
+        route.send('Perhaps you should provide a stock symbol... ?');
         return;
     }
 
     // Parse stock symbols from the args
-    var symbols = args.map(function (symbol){
+    var symbols = args.map(function (symbol) {
         return symbol.replace(/,/g, '');
     });
 
@@ -28,8 +28,9 @@ function getStocks(route, args) {
             if (response.length > 0) {
                 var stockValues = [];
 
-                for (var index in response)
+                for (var index in response) {
                     stockValues.push('     ' + response[index].name + ' closed yesterday at $' + (parseFloat(response[index].l) - parseFloat(response[index].c)).toString() + '; opened today at $' + response[index].op + ' and is currently at $' + response[index].l + ' (' + response[index].cp + '% from close)');
+                }
 
                 route.send('Stock prices for ' + symbols.join(', ') + ':\n' + stockValues.join('\n'));
             }
@@ -42,15 +43,15 @@ function getStocks(route, args) {
 }
 
 module.exports = {
-    'displayname': 'Stocks',
-    'description': 'Returns information for the requested stock symbol.',
+    displayname : 'Stocks',
+    description : 'Returns information for the requested stock symbol.',
 
-    commands: [{
-            'name': 'Stocks',
-            'description': 'Returns information for the requested stock symbol.',
-            'usage': 'stock [search term]',
-            'trigger': /stock/i,
-            'func': getStocks
+    commands : [{
+            name : 'Stocks',
+            description : 'Returns information for the requested stock symbol.',
+            usage : 'stock [search term]',
+            trigger : /stock/i,
+            func : getStocks
         }
     ]
 };

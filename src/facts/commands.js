@@ -1,6 +1,8 @@
 var _ = require('lodash');
 
 var last_info = [];
+var rate_limit = {};
+var timeout = {};
 
 module.exports = {
 	learn : function (route, args) {
@@ -61,11 +63,32 @@ module.exports = {
 		}
 	},
 	listener : function (route, message) {
+
+		if (route.room && rate_limit[route.room] && rate_limit[route.room] > new Date()) {
+			// Can't trigger, rate limited
+			// Helps prevent two bots triggering off each other infinitely, or triggering multiple facts when entering a room.
+			return false;
+		}
+
 		var bot = this;
 		var triggered =  this.db.schemas.factTrigger.checkMessage(message);
 
 		if (triggered) {
-			triggered.trigger.getFactoid().then(function (factoid) {
+			// Set rate limit in room
+			if (route.room) {
+				var limit = new Date();
+				limit.setSeconds(limit.getSeconds() + 1);
+				rate_limit[route.room] = limit;
+			}
+
+			var trigger = triggered.trigger;
+
+			// Set new timeout
+			trigger.timeout = new Date();
+			trigger.timeout.setMinutes(trigger.timeout.getMinutes() + Math.floor(Math.random() * 5) + 5);
+
+			// Get, process, and send the factoid
+			trigger.getFactoid().then(function (factoid) {
 				var output = factoid.factoid;
 
 				console.log('Triggered raw fact:', output);
@@ -78,15 +101,18 @@ module.exports = {
 					match : triggered.match[0]
 				};
 
+				// Replace who and what with the triggerer and the match
 				output = output.replace(/\$who/ig, route.nick);
 				output = output.replace(/\$what/ig, triggered.match[1]);
 
+				// Chose random people in the room
 				var someone = /\$someone/i;
 				while (someone.test(output)) {
 					output = output.replace(someone, _.sample(bot.users.getRoomRoster(route.room)).nick);
 				}
 
-				var something = /(\$something)|(\$item)/i;
+				// Some people like using $something instead of $item
+				var something = /(\$something)/i;
 				while (something.test(output)) {
 					output = output.replace(something, bot.db.schemas.word.selectByType('$item'));
 				}

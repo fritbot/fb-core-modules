@@ -7,7 +7,7 @@ function getWeather(route, args) {
     var apiKey = '83f199a422e382c3';
 
     // Parse location from the args; fall back to Austin if no location was passed
-    var location = args.length ? querystring.escape(args.map(function(x){return x.replace(/,/g, '');})) : 'TX/Austin';
+    var location = args.length ? querystring.escape(args.map(function (x) { return x.replace(/,/g, ''); })) : 'TX/Austin';
 
     // Set up the URL for the request
     var url = 'http://api.wunderground.com/api/' + apiKey + '/conditions/q/' + location + '.json';
@@ -25,8 +25,9 @@ function getWeather(route, args) {
         } else if (results.response.results) {
             // If Wunderground returns a list of cities, list them
             var possibilities = [];
-            for (var index in results.response.results)
+            for (var index in results.response.results) {
                 possibilities.push('     ' + (parseInt(index) + 1) + '. ' + results.response.results[index].city + ', ' + results.response.results[index].state + ' ' + results.response.results[index].country);
+            }
             route.send('Wunderground found a few possibilities; try one of the following instead:\n' + possibilities.join('\n'));
         } else if (results.response.error) {
             // If Wunderground returns an error, print it
@@ -40,16 +41,16 @@ function getWeather(route, args) {
 }
 
 module.exports = {
-    'displayname': "Weather",
-    'description': "Gets the current weather.",
+    displayname : 'Weather',
+    description : 'Gets the current weather.',
 
-    commands: [
+    commands : [
         {
-            'name': 'Weather',
-            'description': "Gets the current weather.",
-            'usage': 'weather [search term]',
-            'trigger': /weather/i,
-            'func': getWeather
+            name : 'Weather',
+            description : 'Gets the current weather.',
+            usage : 'weather [search term]',
+            trigger : /weather/i,
+            func : getWeather
         }
     ]
 };

@@ -2,6 +2,7 @@ module.exports = {
     displayname : 'Core Modules',
     description : 'Core Fritbot functions.',
     children : [
+        require('./src/control'),
         require('./src/facts'),
         require('./src/google'),
         require('./src/help'),
