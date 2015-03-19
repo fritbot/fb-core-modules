@@ -19,6 +19,13 @@ module.exports = {
             usage : 'what was that',
             trigger : /what was that/i,
             func : commands.explain
+        }, {
+            name : 'Have Item or Learn Word',
+            description : 'Teaches Fritbot a new word or item. Type must start with $, omit to give items.' +
+                '\nExample: "have a cow" results in adding "a cow" to $item list, "have $color yellow" adds yellow to $color list. ',
+            usage : 'have [$type] itemname',
+            trigger : /have/i,
+            func : commands.have
         }
     ],
 

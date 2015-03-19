@@ -2,12 +2,23 @@ var _ = require('lodash');
 var Q = require('q');
 
 var loaded_triggers = [];
+var loaded_words = {};
 
 function loadTrigger(trigger) {
 	trigger.rex = new RegExp(trigger.trigger, 'i');
 	loaded_triggers.push(trigger);
 	// Pass through trigger for deferred chaining
 	return Q(trigger);
+}
+
+function loadWord(word) {
+	if (!loaded_words[word.type]) {
+		loaded_words[word.type] = [];
+	}
+
+	loaded_words[word.type].push(word.word);
+	// Pass through trigger for deferred chaining
+	return Q(word);
 }
 
 module.exports = function (bot) {
@@ -88,6 +99,9 @@ module.exports = function (bot) {
 
 	// Load all existing triggers
 	bot.db.schemas.factTrigger.find({}, function (err, triggers) {
+		if (err) {
+			console.log('Error loading triggers:', err, '\nFacts likely will not work.');
+		}
 		for (var i = 0; i < triggers.length; i++) {
 			var trigger = triggers[i];
 			loadTrigger(trigger);
@@ -103,4 +117,42 @@ module.exports = function (bot) {
 
 	// Create factoid model
 	bot.db.schemas.factFactoid = bot.db.mongoose.model('FactFactoid', factoidSchema);
+
+	// Create word schema
+	var wordSchema = new bot.db.mongoose.Schema({
+		type : { type : String, required : true, index : true },
+		word : { type : String, required : true }
+	});
+
+	// Get key types
+	wordSchema.statics.getTypes = function () {
+		return _.keys(loaded_words);
+	};
+
+	// Get a random word, yo
+	wordSchema.statics.selectByType = function (type) {
+		return _.sample(loaded_words[type] || []);
+	};
+
+	// Create word if it doesn't exist
+	wordSchema.statics.createIfNotExists = function (obj) {
+		return this.findOneQ(obj).then(function (existing) {
+			if (!existing) {
+				return this.createQ(obj).then(loadWord);
+			} else {
+				return Q(existing);
+			}
+		}.bind(this));
+	};
+
+	// Create word model
+	bot.db.schemas.word = bot.db.mongoose.model('Word', wordSchema);
+
+	// Load all existing triggers
+	bot.db.schemas.word.find({}, function (err, words) {
+		for (var i = 0; i < words.length; i++) {
+			var word = words[i];
+			loadWord(word);
+		}
+	});
 };

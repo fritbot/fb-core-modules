@@ -57,7 +57,7 @@ module.exports = {
 			}
 			route.send(out);
 		} else {
-			route.send('I didn\'t do anything...')
+			route.send('I didn\'t do anything...');
 		}
 	},
 	listener : function (route, message) {
@@ -67,6 +67,8 @@ module.exports = {
 		if (triggered) {
 			triggered.trigger.getFactoid().then(function (factoid) {
 				var output = factoid.factoid;
+
+				console.log('Triggered raw fact:', output);
 
 				// Save info about last triggered fact
 				last_info = {
@@ -84,6 +86,19 @@ module.exports = {
 					output = output.replace(someone, _.sample(bot.users.getRoomRoster(route.room)).nick);
 				}
 
+				var something = /(\$something)|(\$item)/i;
+				while (something.test(output)) {
+					output = output.replace(something, bot.db.schemas.word.selectByType('$item'));
+				}
+
+				_.forEach(bot.db.schemas.word.getTypes(), function (type) {
+					// don't forget to add a slash before the $!!
+					var regex = new RegExp('\\' + type, 'i');
+					while (regex.test(output)) {
+						output = output.replace(regex, bot.db.schemas.word.selectByType(type));
+					}
+				});
+
 				route.indirect().send(output);
 			}, function (err) {
 				console.log('Error getting factoid:', err);
@@ -92,5 +107,30 @@ module.exports = {
 		} else {
 			return false;
 		}
+	},
+	have : function (route, args) {
+		var bot = this;
+		var type = args.shift();
+
+		if (type[0] !== '$') {
+			args.unshift(type);
+			type = '$item';
+		} else if (type === '$something' || type === 'item') {
+			// handle silly users
+			type = '$item';
+		}
+
+		var word = args.join(' ');
+
+		bot.db.schemas.word.createIfNotExists({ type : type, word : word }).then(function () {
+			if (type === '$item') {
+				route.send('Thanks for ' + word + '!');
+			} else {
+				route.send('Adding ' + word + ' to ' + type + ' list.');
+			}
+		}, function (err) {
+			console.log('Error adding word:', err);
+			route.send('Error adding word:', err);
+		});
 	}
 };
