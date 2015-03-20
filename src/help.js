@@ -56,7 +56,7 @@ module.exports = {
 
 	commands : [{
 		name : 'Show Commands',
-		Description : 'Show all available commands',
+		description : 'Show all available commands',
 		usage : 'help [topic]',
 		trigger : /help/i,
 		func : displayHelp,

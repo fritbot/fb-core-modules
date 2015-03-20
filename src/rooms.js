@@ -33,13 +33,15 @@ module.exports = {
 
     commands : [{
             name : 'Leave Room',
+            description : 'Leaves current room, or optionally any other room he is in.',
             usage : 'leave [room_name]',
             trigger : /leave/i,
             func : leaveRoom,
             core : true
         }, {
             name : 'Join Room',
-            usage : 'join (room_name)',
+            description : 'Joins another room.',
+            usage : 'join room_name',
             trigger : /join/i,
             func : joinRoom,
             core : true
