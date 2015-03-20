@@ -1,0 +1,26 @@
+script(src='//cdn.datatables.net/1.10.5/js/jquery.dataTables.min.js')
+script(src='static/table.js')
+
+.container-fluid
+    .row
+        .col-xs-12
+            h1 Quotes
+            table.table.table-striped#maintable
+                thead
+                    tr
+                        th Quote
+                        th Author
+                        th
+                tfoot
+                    tr
+                        th Quotes
+                        th Authors
+                        th
+                tbody
+                    each quote in quotes
+                        tr
+                            td= quote.text
+                            td= quote.nick
+                            td
+                                a(href="#")
+                                    span.glyphicon.glyphicon-remove

@@ -1,11 +1,11 @@
-var commands = require('./commands'),
-    schema_init = require('./schema');
+var commands = require('./commands');
 
 module.exports = {
     displayname : 'Facts',
     description : 'Recites factoids in response to things people say in chat.',
 
-    init : schema_init,
+    init : require('./schema'),
+    web_init : require('./web'),
 
     commands : [{
             name : 'Learn Fact',

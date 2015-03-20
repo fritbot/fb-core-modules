@@ -1,0 +1,29 @@
+script(src='//cdn.datatables.net/1.10.5/js/jquery.dataTables.min.js')
+script(src='static/table.js')
+
+.container-fluid
+    .row
+        .col-xs-12
+            h1 Facts
+            table.table.table-striped#maintable
+                thead
+                    tr
+                        th Trigger
+                        th Factoid
+                        th
+                tfoot
+                    tr
+                        th Triggers
+                        th Factoids
+                        th
+                tbody
+                    each fact in facts
+                        tr
+                            td= fact.trigger.trigger
+                            td= fact.factoid
+                            td
+                                a(href="#")
+                                    span.glyphicon.glyphicon-pencil.text-success
+                                |  
+                                a(href="#")
+                                    span.glyphicon.glyphicon-remove
