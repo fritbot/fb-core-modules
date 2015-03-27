@@ -45,6 +45,10 @@ function displayHelp (route) {
 		}
 	}
 
+	if (this.web && this.config.web_host) {
+		out.push('Additional information available at http://' + this.config.web_host + '/commands');
+	}
+
 	route.direct().send(out.join('\n'));
 }
 
