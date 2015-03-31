@@ -29,7 +29,7 @@ function getStocks(route, args) {
                 var stockValues = [];
 
                 for (var index in response) {
-                    stockValues.push('     ' + response[index].name + ' closed yesterday at $' + (parseFloat(response[index].l) - parseFloat(response[index].c)).toString() + '; opened today at $' + response[index].op + ' and is currently at $' + response[index].l + ' (' + response[index].cp + '% from close)');
+                    stockValues.push('     ' + response[index].name + ' closed yesterday at $' + (parseFloat(response[index].l) - parseFloat(response[index].c)).toFixed(2).toString() + '; opened today at $' + response[index].op + ' and is currently at $' + response[index].l + ' (' + response[index].cp + '% from close)');
                 }
 
                 route.send('Stock prices for ' + symbols.join(', ') + ':\n' + stockValues.join('\n'));
