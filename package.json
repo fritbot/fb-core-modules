@@ -2,11 +2,7 @@
   "name": "fb-core-modules",
   "version": "0.8.2",
   "description": "Fritbot Core Modules",
-  "dependencies": {
-    "request": "",
-    "lodash": "",
-    "q": ""
-  },
+  "dependencies": {},
   "devDependencies": {
     "grunt": "",
     "grunt-push-release": "",
